@@ -1,0 +1,108 @@
+name: CI/CD — Portfolio Frontend (Cloud Run Scale-to-Zero)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+# FinOps en CI: Cancela ejecuciones redundantes de la misma rama para ahorrar minutos de GitHub Actions
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  GCP_REGION: "us-east1"
+  SERVICE_NAME: "portfolio-frontend"
+  GAR_REPOSITORY: "cloud-run-source-deploy"
+
+jobs:
+  # ============================================================================
+  # JOB 1: INTEGRACIÓN CONTINUA (Tipado Estricto, Linter y Build Standalone)
+  # ============================================================================
+  ci-quality-gate:
+    name: Quality Gate (TypeScript, ESLint & Standalone Build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies (Clean Install)
+        run: npm ci
+
+      - name: TypeScript Strict Typecheck
+        run: npx tsc --noEmit
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Verify Next.js Standalone Build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: npm run build
+
+  # ============================================================================
+  # JOB 2: DESPLIEGUE CONTINUO A GOOGLE CLOUD RUN (Solo en push a main)
+  # ============================================================================
+  cd-deploy-cloud-run:
+    name: Deploy to Google Cloud Run (FinOps $0 Idle)
+    needs: ci-quality-gate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Google Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build & Push Multi-Stage Docker Image
+        env:
+          IMAGE_TAG: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+        run: |
+          docker build -t "$IMAGE_TAG" .
+          docker push "$IMAGE_TAG"
+
+      - name: Deploy to Cloud Run (Scale-to-Zero FinOps Configuration)
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          flags: >-
+            --allow-unauthenticated
+            --port=3000
+            --min-instances=0
+            --max-instances=3
+            --cpu=1
+            --memory=512Mi
+            --cpu-throttling
+          env_vars: |
+            NODE_ENV=production
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            GATEKEEPER_MASTER_OTP=${{ secrets.GATEKEEPER_MASTER_OTP }}
+

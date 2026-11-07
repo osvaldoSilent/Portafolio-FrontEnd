@@ -62,7 +62,7 @@ export default function HeaderApp({ isUnlocked = false }: HeaderAppProps) {
             href="/api-docs"
             className="bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white rounded-xl px-3.5 py-3 text-xs font-mono transition"
           >
-            Swagger / OpenAPI
+            OpenAPI
           </Link>
 
           {isUnlocked ? (

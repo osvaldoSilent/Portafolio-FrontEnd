@@ -1,6 +1,11 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 
-// Asegúrate de tener tu DATABASE_URL real en .env.local
-const sql = neon(process.env.DATABASE_URL!);
+// Fallback seguro en tiempo de compilación (Docker / CI build) para que neon() no falle al evaluar el módulo.
+// En producción (Cloud Run) y desarrollo local (.env.local) usa DATABASE_URL real.
+const connectionString =
+  process.env.DATABASE_URL ||
+  "postgresql://build_user:build_pass@ep-build-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require";
+
+const sql = neon(connectionString);
 export const db = drizzle(sql);

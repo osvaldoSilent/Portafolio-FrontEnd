@@ -2,6 +2,7 @@
 import { Suspense } from "react";
 import { getTelemetryUseCase } from "../core/use-cases/get-telemetry.use-case";
 import { getTelemetryRepository } from "../infrastructure/container";
+import DummyInteractionCounter from "./DummyInteractionCounter";
 
 interface TelematryProps {
   isUnlocked?: boolean;
@@ -15,15 +16,15 @@ async function TelemetryMetricsView({ isUnlocked }: { isUnlocked: boolean }) {
     <div className="space-y-4">
       <div className="flex items-baseline justify-between border-b border-zinc-800 pb-3">
         <span className="text-sm text-zinc-400">
-          {stats.isLive ? "Interacciones registradas" : "Interacciones (Dummy)"}
+          {stats.isLive ? "Interacciones registradas" : "Interacciones en sesión (Demo)"}
         </span>
-        <span
-          className={`text-3xl font-mono font-bold ${
-            stats.isLive ? "text-emerald-400" : "text-zinc-400"
-          }`}
-        >
-          {stats.interactionsCount}
-        </span>
+        {stats.isLive ? (
+          <span className="text-3xl font-mono font-bold text-emerald-400">
+            {stats.interactionsCount}
+          </span>
+        ) : (
+          <DummyInteractionCounter initialCount={stats.interactionsCount} />
+        )}
       </div>
       <div className="flex items-baseline justify-between border-b border-zinc-800 pb-3">
         <span className="text-sm text-zinc-400">Latencia Query HTTP</span>
@@ -32,7 +33,7 @@ async function TelemetryMetricsView({ isUnlocked }: { isUnlocked: boolean }) {
             stats.isLive ? "text-cyan-400" : "text-zinc-400"
           }`}
         >
-          {stats.isLive ? `${stats.latencyMs} ms` : `~${stats.latencyMs} ms (Mock)`}
+          {stats.isLive ? `${stats.latencyMs} ms` : `${stats.latencyMs} ms (Local)`}
         </span>
       </div>
       <div className="flex items-center justify-between text-xs text-zinc-500 font-mono">

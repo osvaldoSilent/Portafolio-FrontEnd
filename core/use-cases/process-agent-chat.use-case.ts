@@ -29,7 +29,7 @@ export async function processAgentChatUseCase(
 
   const botResponse = persistedInDb
     ? baseAnswer
-    : `[Modo Demo] ${baseAnswer} (Inicia sesión arriba para persistir en Neon DB).`;
+    : `${baseAnswer} Esta es una respuesta predeterminada, inicia sesión para hablar con un agente AI real.`;
 
   return {
     botResponse,

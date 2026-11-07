@@ -39,7 +39,7 @@ portfolio-frontend/
 │   ├── actions/auth.ts                        # Server Actions (Gatekeeper RPC)
 │   ├── api/chat/route.ts                      # Endpoint REST POST /api/chat
 │   ├── api/openapi/route.ts                   # Endpoint OpenAPI 3.1 JSON (GET /api/openapi)
-│   ├── api-docs/page.tsx                      # Consola interactiva Swagger / OpenAPI (/api-docs)
+│   ├── api-docs/page.tsx                      # Consola interactiva OpenAPI (/api-docs)
 │   └── page.tsx                               # Bento Grid Principal (Server Component Streaming)
 │
 ├── components/                                # 🟣 ADAPTADORES UI
@@ -57,7 +57,7 @@ portfolio-frontend/
 
 ---
 
-## 2. Documentación de API (Swagger / OpenAPI 3.1)
+## 2. Documentación de API (OpenAPI 3.1)
 
 El proyecto incluye su propia documentación interactiva equivalente a **Swagger UI**:
 
