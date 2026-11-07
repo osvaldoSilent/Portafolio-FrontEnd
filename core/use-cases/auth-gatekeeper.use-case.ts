@@ -2,7 +2,9 @@
 import { OtpRequestResult, OtpVerifyResult } from "../domain/models";
 import { SessionGateway } from "../ports/session.gateway";
 
-const DEMO_MASTER_OTP = "123456";
+function getMasterOtp(): string {
+  return process.env.GATEKEEPER_MASTER_OTP || "123456";
+}
 
 export async function requestOtpUseCase(email: string): Promise<OtpRequestResult> {
   const cleanEmail = email?.trim() ?? "";
@@ -19,13 +21,14 @@ export async function requestOtpUseCase(email: string): Promise<OtpRequestResult
 export async function verifyOtpUseCase(
   email: string,
   otp: string,
-  sessionGateway: SessionGateway
+  sessionGateway: SessionGateway,
+  expectedOtp: string = getMasterOtp()
 ): Promise<OtpVerifyResult> {
   if (!email?.includes("@")) {
     return { error: "Correo corporativo inválido" };
   }
 
-  if (otp?.trim() === DEMO_MASTER_OTP) {
+  if (otp?.trim() && otp.trim() === expectedOtp) {
     await sessionGateway.createSession();
     return { success: true };
   }
@@ -38,4 +41,5 @@ export async function logoutUseCase(
 ): Promise<void> {
   await sessionGateway.destroySession();
 }
+
 

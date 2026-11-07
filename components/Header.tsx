@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { logout } from "../app/actions/auth";
 import Gatekeeper from "./Gatekeeper";
@@ -56,6 +57,13 @@ export default function HeaderApp({ isUnlocked = false }: HeaderAppProps) {
             <span className="text-zinc-500 block">INFRAESTRUCTURA</span>
             <span className="text-cyan-400 font-semibold">Cloud Run + Neon</span>
           </div>
+
+          <Link
+            href="/api-docs"
+            className="bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white rounded-xl px-3.5 py-3 text-xs font-mono transition"
+          >
+            Swagger / OpenAPI
+          </Link>
 
           {isUnlocked ? (
             <button

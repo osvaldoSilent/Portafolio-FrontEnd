@@ -99,8 +99,10 @@ export default function Gatekeeper({ onClose }: GatekeeperProps) {
         ) : (
           <div className="space-y-3">
             <input
-              type="text"
-              placeholder="Ingresa el OTP (Usa 123456 para demo)"
+              type="password"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="Código OTP de 6 dígitos"
               value={otp}
               maxLength={6}
               onChange={(e) => setOtp(e.target.value)}

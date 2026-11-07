@@ -15,7 +15,7 @@ export class NeonTelemetryAdapter implements TelemetryRepository {
     return {
       interactionsCount: interacciones.length,
       latencyMs,
-      databaseRegion: "neondb (us-east-1)",
+      databaseRegion: "aws-us-east-1 (Pooler)",
       poolerStatus: "ACTIVE_POOLER",
       driverName: "@neondatabase/serverless (HTTP Live)",
       isLive: true,

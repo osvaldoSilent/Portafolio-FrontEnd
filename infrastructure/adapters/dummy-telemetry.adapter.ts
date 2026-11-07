@@ -7,7 +7,7 @@ export class DummyTelemetryAdapter implements TelemetryRepository {
     return {
       interactionsCount: 42,
       latencyMs: 15,
-      databaseRegion: "neondb (us-east-1)",
+      databaseRegion: "aws-us-east-1 (Pooler)",
       poolerStatus: "DEMO_OFFLINE",
       driverName: "Mock Local (Inicia sesión para consultar Neon)",
       isLive: false,

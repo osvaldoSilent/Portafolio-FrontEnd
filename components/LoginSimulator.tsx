@@ -118,8 +118,8 @@ export default function LoginSimulator({ isUnlocked = false }: LoginSimulatorPro
         
         <pre className={`text-zinc-300 overflow-x-auto leading-relaxed transition-opacity duration-500 ${jwtGenerated ? "opacity-100" : "opacity-30 blur-[2px]"}`}>
 {`{
-  "sub": "osvaldo_architect",
-  "iss": "${isUnlocked ? "login-service.cloudrun.live" : "login-service.simulator"}",
+  "sub": "principal_cloud_architect",
+  "iss": "${isUnlocked ? "login-service.cloudrun.internal" : "login-service.simulator"}",
   "roles": ["ROLE_ARCHITECT", "ROLE_ADMIN"],
   "mode": "${isUnlocked ? "PRODUCTION_API" : "DEMO_SANDBOX"}",
   "iat": ${jwtGenerated ? Math.floor(Date.now() / 1000) : "1793990000"},
